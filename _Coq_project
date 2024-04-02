@@ -1,5 +1,0 @@
--Q theories ProjectName
--arg -w -arg -notation-overridden
--R /Users/maximchurilov/category-theory-master Category
-
-theories/Module1.v
