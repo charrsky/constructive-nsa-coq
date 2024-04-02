@@ -33,25 +33,20 @@ Record FilterBase := {
 }.
 
 Record FilterBaseMap (FB1 FB2 : FilterBase) := {
-  alpha : Jset (J FB1) -> Jset (J FB2) -> Prop; (* The binary relation defining the map *)
+  alpha : Jset (J FB1) -> Jset (J FB2) -> Prop;
 
   alpha_respects_equivalences : forall j1 j1' j2 j2',
     Jeq_rel (J FB1) j1 j1' -> Jeq_rel (J FB2) j2 j2' ->
     alpha j1 j2 <-> alpha j1' j2';
 
-  (* Ensure totality and functionality on some base set F_i of FB1. This might require
-     adjusting the definition to accurately capture the intended mathematical properties,
-     such as ensuring there exists at least one j' for every j in the domain of F. *)
   alpha_total_functional : exists i : Iset (I FB1), forall j : Jset (J FB1),
     (F FB1) i j -> exists j' : Jset (J FB2), (alpha j j') /\ 
     (forall j'' : Jset (J FB2), (alpha j j'') -> (Jeq_rel (J FB2)) j' j'');
 }.
 
 Record ContinuousFilterBaseMap (FB1 FB2 : FilterBase) := {
-  base_map : FilterBaseMap FB1 FB2;  (* Embedding the basic map structure *)
+  base_map : FilterBaseMap FB1 FB2;
 
-  (* Continuity condition: for each `k` in `FB2`, there exists some `i` in `FB1` such that
-     the image of `F_i` under `alpha` is a subset of `F_k'`. *)
   continuity_condition : forall k : Iset (I FB2),
     exists i : Iset (I FB1), forall x : Jset (J FB1),
       F FB1 i x -> exists y : Jset (J FB2), alpha FB1 FB2 base_map x y;
@@ -84,9 +79,8 @@ Proof.
   unfold continuous_map_equiv in H, H0. 
   destruct H as [i H], H0 as [i' H0].
 
-  (* Use filter_condition to find a common i that works for both x -> y and y -> z *)
   destruct (filter_condition FB1 i i') as [k Hk].
-  
+
   exists k. intros j l F_kj. apply Hk in F_kj. destruct F_kj.
   specialize (H j l H1); specialize (H0 j l H2). intuition.
 Qed.
@@ -153,6 +147,8 @@ Definition id_ContinuousFilterBaseMap (FB : FilterBase) :
   continuity_condition := id_alpha_continuous
 |}.
 
+(* TODO *)
+
 Definition compose_alpha {FB1 FB2 FB3 : FilterBase}
   (f : FilterBaseMap FB2 FB3) (g : FilterBaseMap FB1 FB2)
   : Jset (J FB1) -> Jset (J FB3) -> Prop :=
@@ -164,10 +160,10 @@ Definition compose_ContinuousFilterBaseMap {FB1 FB2 FB3 : FilterBase}
   : ContinuousFilterBaseMap FB1 FB3 := {|
 
   base_map := {| alpha := compose_alpha (base_map f) (base_map g); 
-                 alpha_respects_equivalences := _ ;  (* Proof required *)
-                 alpha_total_functional := _ ;       (* Proof required *)
+                 alpha_respects_equivalences := _ ;
+                 alpha_total_functional := _ ;
               |};
-  continuity_condition := _                             (* Proof of composed continuity *)
+  continuity_condition := _
 
 |}.
 
@@ -182,6 +178,3 @@ Instance FilterBaseCategory : Category := {
   id := id_ContinuousFilterBaseMap;
   
 }.
-
-
-Print FilterBase.
